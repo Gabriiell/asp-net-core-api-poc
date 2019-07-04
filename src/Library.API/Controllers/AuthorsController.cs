@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 
 namespace Library.API.Controllers
 {
+    [Route("api/authors")]
     public class AuthorsController : Controller
     {
         private ILibraryRepository _libraryRepository;
