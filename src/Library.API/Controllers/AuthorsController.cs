@@ -1,4 +1,7 @@
-﻿using Library.API.Helpers;
+﻿using AutoMapper;
+using AutoMapper.QueryableExtensions;
+using Library.API.Helpers;
+using Library.API.Models;
 using Library.API.Services;
 using Microsoft.AspNetCore.Mvc;
 using System;
@@ -20,16 +23,10 @@ namespace Library.API.Controllers
 
         public IActionResult GetAuthors()
         {
-            var authors = _libraryRepository.GetAuthors()
-                .Select(a => new AuthorDto
-                {
-                    Id = a.Id,
-                    Name = $"{a.FirstName} {a.LastName}",
-                    Age = a.DateOfBirth.GetCurrentAge(),
-                    Genre = a.Genre
-                });
+            var authors = _libraryRepository.GetAuthors();
+            var authorsDto = Mapper.Map<IEnumerable<AuthorDto>>(authors);
 
-            return new JsonResult(authors);
+            return new JsonResult(authorsDto);
         }
     }
 }

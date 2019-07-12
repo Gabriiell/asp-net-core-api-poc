@@ -11,6 +11,7 @@ using Microsoft.Extensions.Configuration;
 using Library.API.Services;
 using Library.API.Entities;
 using Microsoft.EntityFrameworkCore;
+using Library.API.Helpers;
 
 namespace Library.API
 {
@@ -51,6 +52,12 @@ namespace Library.API
             {
                 app.UseExceptionHandler();
             }
+
+            AutoMapper.Mapper.Initialize(cfg =>
+            {
+                cfg.AddProfile<AutoMapperCustomProfile>();
+                cfg.ValidateInlineMaps = false;
+            });
 
             libraryContext.EnsureSeedDataForContext();
 
