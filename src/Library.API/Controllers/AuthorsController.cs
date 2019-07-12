@@ -23,12 +23,28 @@ namespace Library.API.Controllers
             _mapper = mapper;
         }
 
+        [HttpGet]
         public IActionResult GetAuthors()
         {
             var authors = _libraryRepository.GetAuthors();
             var authorsDto = _mapper.Map<IEnumerable<AuthorDto>>(authors);
 
-            return new JsonResult(authorsDto);
+            return Ok(authorsDto);
+        }
+
+        [HttpGet("{id}")]
+        public IActionResult GetAuthor(Guid id)
+        {
+            var author = _libraryRepository.GetAuthor(id);
+
+            if (author == null)
+            {
+                return NotFound();
+            }
+
+            var authorDto = _mapper.Map<AuthorDto>(author);
+
+            return Ok(authorDto);
         }
     }
 }
