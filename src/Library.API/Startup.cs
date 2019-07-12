@@ -11,6 +11,7 @@ using Microsoft.Extensions.Configuration;
 using Library.API.Services;
 using Library.API.Entities;
 using Microsoft.EntityFrameworkCore;
+using AutoMapper;
 using Library.API.Helpers;
 
 namespace Library.API
@@ -36,13 +37,15 @@ namespace Library.API
             var connectionString = Configuration["connectionStrings:libraryDBConnectionString"];
             services.AddDbContext<LibraryContext>(o => o.UseSqlServer(connectionString));
 
+            services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
+
             // register the repository
             services.AddScoped<ILibraryRepository, LibraryRepository>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IHostingEnvironment env, 
-            ILoggerFactory loggerFactory, LibraryContext libraryContext)
+            ILoggerFactory loggerFactory, IMapper autoMapper, LibraryContext libraryContext)
         {           
             if (env.IsDevelopment())
             {
@@ -53,13 +56,8 @@ namespace Library.API
                 app.UseExceptionHandler();
             }
 
-            AutoMapper.Mapper.Initialize(cfg =>
-            {
-                cfg.AddProfile<AutoMapperCustomProfile>();
-                cfg.ValidateInlineMaps = false;
-            });
-
             libraryContext.EnsureSeedDataForContext();
+            autoMapper.ConfigurationProvider.AssertConfigurationIsValid();
 
             app.UseMvc(); 
         }

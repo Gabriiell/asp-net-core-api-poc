@@ -14,17 +14,19 @@ namespace Library.API.Controllers
     [Route("api/authors")]
     public class AuthorsController : Controller
     {
-        private ILibraryRepository _libraryRepository;
+        private readonly ILibraryRepository _libraryRepository;
+        private readonly IMapper _mapper;
 
-        public AuthorsController(ILibraryRepository libraryRepository)
+        public AuthorsController(ILibraryRepository libraryRepository, IMapper mapper)
         {
             _libraryRepository = libraryRepository;
+            _mapper = mapper;
         }
 
         public IActionResult GetAuthors()
         {
             var authors = _libraryRepository.GetAuthors();
-            var authorsDto = Mapper.Map<IEnumerable<AuthorDto>>(authors);
+            var authorsDto = _mapper.Map<IEnumerable<AuthorDto>>(authors);
 
             return new JsonResult(authorsDto);
         }
