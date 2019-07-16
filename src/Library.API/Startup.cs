@@ -53,7 +53,14 @@ namespace Library.API
             }
             else
             {
-                app.UseExceptionHandler();
+                app.UseExceptionHandler(appBuilder =>
+                {
+                    appBuilder.Run(async context =>
+                    {
+                        context.Response.StatusCode = 500;
+                        await context.Response.WriteAsync("Unexpected error, try again later...");
+                    });
+                });
             }
 
             libraryContext.EnsureSeedDataForContext();
