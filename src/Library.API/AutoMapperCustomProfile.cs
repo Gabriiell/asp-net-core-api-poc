@@ -16,6 +16,11 @@ namespace Library.API
                 .ForMember(dest => dest.Books, opt => opt.Ignore());
 
             CreateMap<Entities.Book, Models.BookDto>();
+
+            CreateMap<Models.BookForCreationDto, Entities.Book>()
+                .ForMember(dest => dest.Id, opt => opt.Ignore())
+                .ForMember(dest => dest.AuthorId, opt => opt.Ignore())
+                .ForMember(dest => dest.Author, opt => opt.Ignore());
         }
     }
 }
