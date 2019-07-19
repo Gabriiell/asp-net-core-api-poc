@@ -12,8 +12,7 @@ namespace Library.API
                 .ForMember(dest => dest.Age, opt => opt.MapFrom(src => src.DateOfBirth.GetCurrentAge()));
 
             CreateMap<Models.AuthorForCreationDto, Entities.Author>()
-                .ForMember(dest => dest.Id, opt => opt.Ignore())
-                .ForMember(dest => dest.Books, opt => opt.Ignore());
+                .ForMember(dest => dest.Id, opt => opt.Ignore());
 
             CreateMap<Entities.Book, Models.BookDto>();
 
