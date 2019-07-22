@@ -136,12 +136,10 @@ namespace Library.API.Controllers
 
             if (!_libraryRepository.Save())
             {
-                throw new Exception($"Creating a book for author {authorId} failed on save.");
+                throw new Exception($"Updating book {id} for author {authorId} failed on save.");
             }
 
-            var bookDto = _mapper.Map<BookDto>(bookEntity);
-
-            return Ok(bookDto);
+            return NoContent();
         }
     }
 }
