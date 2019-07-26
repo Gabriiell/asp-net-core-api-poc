@@ -124,6 +124,11 @@ namespace Library.API.Controllers
                 return BadRequest();
             }
 
+            if (!ModelState.IsValid)
+            {
+                return new UnprocessableEntityObjectResult(ModelState);
+            }
+
             if (!_libraryRepository.AuthorExists(authorId))
             {
                 return NotFound();
