@@ -175,7 +175,14 @@ namespace Library.API.Controllers
 
             var bookToPatch = _mapper.Map<BookForUpdateDto>(bookEntity);
 
-            patchDoc.ApplyTo(bookToPatch);
+            patchDoc.ApplyTo(bookToPatch, ModelState);
+
+            TryValidateModel(bookToPatch);
+
+            if (!ModelState.IsValid)
+            {
+                return new UnprocessableEntityObjectResult(ModelState);
+            }
 
             _mapper.Map(bookToPatch, bookEntity);
 
