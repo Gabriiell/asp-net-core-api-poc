@@ -14,6 +14,7 @@ using Microsoft.EntityFrameworkCore;
 using AutoMapper;
 using Library.API.Helpers;
 using Microsoft.AspNetCore.Mvc.Formatters;
+using Microsoft.AspNetCore.Diagnostics;
 
 namespace Library.API
 {
@@ -63,6 +64,14 @@ namespace Library.API
                 {
                     appBuilder.Run(async context =>
                     {
+                        var exceptionHandlerFeature = context.Features.Get<IExceptionHandlerFeature>();
+
+                        if (exceptionHandlerFeature != null)
+                        {
+                            var logger = loggerFactory.CreateLogger("Global exception logger");
+                            logger.LogError(500, exceptionHandlerFeature.Error, exceptionHandlerFeature.Error.Message);
+                        }
+
                         context.Response.StatusCode = 500;
                         await context.Response.WriteAsync("Unexpected error, try again later...");
                     });
