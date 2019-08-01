@@ -4,6 +4,7 @@ using Library.API.Helpers;
 using Library.API.Models;
 using Library.API.Services;
 using Microsoft.AspNetCore.Mvc;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 
@@ -14,19 +15,54 @@ namespace Library.API.Controllers
     {
         private readonly ILibraryRepository _libraryRepository;
         private readonly IMapper _mapper;
+        private readonly IUrlHelper _urlHelper;
 
-        public AuthorsController(ILibraryRepository libraryRepository, IMapper mapper)
+        public AuthorsController(ILibraryRepository libraryRepository, IMapper mapper, IUrlHelper urlHelper)
         {
             _libraryRepository = libraryRepository;
             _mapper = mapper;
+            _urlHelper = urlHelper;
         }
 
-        [HttpGet]
+        [HttpGet(Name = "GetAuthors")]
         public IActionResult GetAuthors(AuthorsResourceParameters authorsResourceParameters)
         {
             var authors = _libraryRepository.GetAuthors(authorsResourceParameters);
-            var authorsDto = _mapper.Map<IEnumerable<AuthorDto>>(authors);
 
+            string previousPageLink = null;
+            string nextPageLink = null;
+
+            if (authors.HasPrevious)
+            {
+                previousPageLink = _urlHelper.Link("GetAuthors", new
+                {
+                    pageNumber = authors.CurrentPage - 1,
+                    pageSize = authors.PageSize
+                });
+            }
+
+            if (authors.HasNext)
+            {
+                nextPageLink = _urlHelper.Link("GetAuthors", new
+                {
+                    pageNumber = authors.CurrentPage + 1,
+                    pageSize = authors.PageSize
+                });
+            }
+
+            var paginationMetadata = new
+            {
+                totalCount = authors.TotalCount,
+                pageSize = authors.PageSize,
+                currentPage = authors.CurrentPage,
+                totalPages = authors.TotalPages,
+                previousPageLink,
+                nextPageLink
+            };
+
+            Response.Headers.Add("X-Pagination", JsonConvert.SerializeObject(paginationMetadata));
+
+            var authorsDto = _mapper.Map<IEnumerable<AuthorDto>>(authors);
             return Ok(authorsDto);
         }
 
