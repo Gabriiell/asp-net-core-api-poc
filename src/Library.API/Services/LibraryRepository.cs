@@ -72,23 +72,22 @@ namespace Library.API.Services
                 .ThenBy(a => a.LastName)
                 .AsQueryable();
 
-            if (!string.IsNullOrEmpty(authorsResourceParameters.Genre))
-            {
-                var genreFilter = authorsResourceParameters.Genre.Trim().ToLowerInvariant();
+            var genreFilter = authorsResourceParameters.Genre;
+            var search = authorsResourceParameters.Search;
 
+            if (!string.IsNullOrEmpty(genreFilter))
+            {
                 authors = authors.Where(a => a.Genre.ToLowerInvariant() == genreFilter);
             }
 
-            if (!string.IsNullOrEmpty(authorsResourceParameters.Search))
+            if (!string.IsNullOrEmpty(search))
             {
-                var search = authorsResourceParameters.Search.Trim().ToLowerInvariant();
-
                 authors = authors.Where(a => a.Genre.ToLowerInvariant().Contains(search)
                                           || a.FirstName.ToLowerInvariant().Contains(search)
                                           || a.LastName.ToLowerInvariant().Contains(search));
             }
 
-            return PagedList<Author>.Create(authors, authorsResourceParameters.PageNumber, authorsResourceParameters.PageSize);
+            return authors.ToPaginatedList(authorsResourceParameters);
         }
 
         public IEnumerable<Author> GetAuthors(IEnumerable<Guid> authorIds)
