@@ -69,7 +69,24 @@ namespace Library.API.Services
         {
             var authors = _context.Authors
                 .OrderBy(a => a.FirstName)
-                .ThenBy(a => a.LastName);
+                .ThenBy(a => a.LastName)
+                .AsQueryable();
+
+            if (!string.IsNullOrEmpty(authorsResourceParameters.Genre))
+            {
+                var genreFilter = authorsResourceParameters.Genre.Trim().ToLowerInvariant();
+
+                authors = authors.Where(a => a.Genre.ToLowerInvariant() == genreFilter);
+            }
+
+            if (!string.IsNullOrEmpty(authorsResourceParameters.Search))
+            {
+                var search = authorsResourceParameters.Search.Trim().ToLowerInvariant();
+
+                authors = authors.Where(a => a.Genre.ToLowerInvariant().Contains(search)
+                                          || a.FirstName.ToLowerInvariant().Contains(search)
+                                          || a.LastName.ToLowerInvariant().Contains(search));
+            }
 
             return PagedList<Author>.Create(authors, authorsResourceParameters.PageNumber, authorsResourceParameters.PageSize);
         }

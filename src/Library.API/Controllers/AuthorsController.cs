@@ -36,6 +36,8 @@ namespace Library.API.Controllers
             {
                 previousPageLink = _urlHelper.Link("GetAuthors", new
                 {
+                    genre = authorsResourceParameters.Genre,
+                    search = authorsResourceParameters.Search,
                     pageNumber = authors.CurrentPage - 1,
                     pageSize = authors.PageSize
                 });
@@ -45,6 +47,8 @@ namespace Library.API.Controllers
             {
                 nextPageLink = _urlHelper.Link("GetAuthors", new
                 {
+                    genre = authorsResourceParameters.Genre,
+                    search = authorsResourceParameters.Search,
                     pageNumber = authors.CurrentPage + 1,
                     pageSize = authors.PageSize
                 });
