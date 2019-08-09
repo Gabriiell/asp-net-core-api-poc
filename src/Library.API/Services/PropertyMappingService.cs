@@ -13,7 +13,7 @@ namespace Library.API.Services
         {
             { "Id", new PropertyMappingValue(new List<string>() { "Id" }) },
             { "Genre", new PropertyMappingValue(new List<string>() { "Genre" }) },
-            { "Age", new PropertyMappingValue(new List<string>() { "DateOfBirth" }) },
+            { "Age", new PropertyMappingValue(new List<string>() { "DateOfBirth" }, true) },
             { "Name", new PropertyMappingValue(new List<string>() { "FirstName", "LastName" }) }
         };
 

@@ -36,6 +36,7 @@ namespace Library.API.Controllers
             {
                 previousPageLink = _urlHelper.Link("GetAuthors", new
                 {
+                    orderBy = authorsResourceParameters.OrderBy,
                     genre = authorsResourceParameters.Genre,
                     search = authorsResourceParameters.Search,
                     pageNumber = authors.CurrentPage - 1,
@@ -47,6 +48,7 @@ namespace Library.API.Controllers
             {
                 nextPageLink = _urlHelper.Link("GetAuthors", new
                 {
+                    orderBy = authorsResourceParameters.OrderBy,
                     genre = authorsResourceParameters.Genre,
                     search = authorsResourceParameters.Search,
                     pageNumber = authors.CurrentPage + 1,
