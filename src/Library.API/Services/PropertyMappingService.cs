@@ -35,5 +35,31 @@ namespace Library.API.Services
 
             return matchingMapping.First()._mappingDictionary;
         }
+
+        public bool ValidMappingExistsFor<TSource, TDestination>(string fields)
+        {
+            var propertyMapping = GetPropertyMapping<TSource, TDestination>();
+
+            if (string.IsNullOrWhiteSpace(fields))
+            {
+                return true;
+            }
+
+            var orderByClauses = fields.Split(",");
+
+            foreach (var orderByClause in orderByClauses)
+            {
+                var trimmedOrderByClause = orderByClause.Trim();
+                var indexOfFirstSpace = trimmedOrderByClause.IndexOf(" ");
+                var propertyName = indexOfFirstSpace == -1 ? trimmedOrderByClause : trimmedOrderByClause.Remove(indexOfFirstSpace);
+
+                if (!propertyMapping.ContainsKey(propertyName))
+                {
+                    return false;
+                }
+            }
+
+            return true;
+        }
     }
 }
