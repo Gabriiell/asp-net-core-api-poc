@@ -43,6 +43,7 @@ namespace Library.API.Controllers
             {
                 previousPageLink = _urlHelper.Link("GetAuthors", new
                 {
+                    fields = authorsResourceParameters.Fields,
                     orderBy = authorsResourceParameters.OrderBy,
                     genre = authorsResourceParameters.Genre,
                     search = authorsResourceParameters.Search,
@@ -55,6 +56,7 @@ namespace Library.API.Controllers
             {
                 nextPageLink = _urlHelper.Link("GetAuthors", new
                 {
+                    fields = authorsResourceParameters.Fields,
                     orderBy = authorsResourceParameters.OrderBy,
                     genre = authorsResourceParameters.Genre,
                     search = authorsResourceParameters.Search,
@@ -75,8 +77,8 @@ namespace Library.API.Controllers
 
             Response.Headers.Add("X-Pagination", JsonConvert.SerializeObject(paginationMetadata));
 
-            var authorsDto = _mapper.Map<IEnumerable<AuthorDto>>(authors);
-            return Ok(authorsDto);
+            var authorsDto = _mapper.Map<PagedList<AuthorDto>>(authors);
+            return Ok(authorsDto.ShapeData(authorsResourceParameters.Fields));
         }
 
         [HttpGet("{id}", Name = "GetAuthor")]

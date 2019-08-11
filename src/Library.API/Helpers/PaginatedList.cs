@@ -28,6 +28,10 @@ namespace Library.API.Helpers
             }
         }
 
+        public PagedList()
+        {
+        }
+
         public PagedList(List<T> items, int count, int pageNumber, int pageSize)
         {
             TotalCount = count;
