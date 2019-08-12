@@ -7,10 +7,10 @@ namespace Library.API.Helpers
 {
     public class PagedList<T> : List<T>
     {
-        public int CurrentPage { get; private set; }
-        public int TotalPages { get; private set; }
-        public int PageSize { get; private set; }
-        public int TotalCount { get; private set; }
+        public int CurrentPage { get; set; }
+        public int TotalPages { get; set; }
+        public int PageSize { get; set; }
+        public int TotalCount { get; set; }
 
         public bool HasPrevious
         {

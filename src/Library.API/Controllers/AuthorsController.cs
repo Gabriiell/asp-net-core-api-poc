@@ -36,48 +36,9 @@ namespace Library.API.Controllers
 
             var authors = _libraryRepository.GetAuthors(authorsResourceParameters);
 
-            string previousPageLink = null;
-            string nextPageLink = null;
+            AddPaginationMetadata(authorsResourceParameters, authors);
 
-            if (authors.HasPrevious)
-            {
-                previousPageLink = _urlHelper.Link("GetAuthors", new
-                {
-                    fields = authorsResourceParameters.Fields,
-                    orderBy = authorsResourceParameters.OrderBy,
-                    genre = authorsResourceParameters.Genre,
-                    search = authorsResourceParameters.Search,
-                    pageNumber = authors.CurrentPage - 1,
-                    pageSize = authors.PageSize
-                });
-            }
-
-            if (authors.HasNext)
-            {
-                nextPageLink = _urlHelper.Link("GetAuthors", new
-                {
-                    fields = authorsResourceParameters.Fields,
-                    orderBy = authorsResourceParameters.OrderBy,
-                    genre = authorsResourceParameters.Genre,
-                    search = authorsResourceParameters.Search,
-                    pageNumber = authors.CurrentPage + 1,
-                    pageSize = authors.PageSize
-                });
-            }
-
-            var paginationMetadata = new
-            {
-                totalCount = authors.TotalCount,
-                pageSize = authors.PageSize,
-                currentPage = authors.CurrentPage,
-                totalPages = authors.TotalPages,
-                previousPageLink,
-                nextPageLink
-            };
-
-            Response.Headers.Add("X-Pagination", JsonConvert.SerializeObject(paginationMetadata));
-
-            var authorsDto = _mapper.Map<PagedList<AuthorDto>>(authors);
+            var authorsDto = _mapper.Map<IEnumerable<AuthorDto>>(authors);
             return Ok(authorsDto.ShapeData(authorsResourceParameters.Fields));
         }
 
@@ -136,6 +97,50 @@ namespace Library.API.Controllers
             }
 
             return NoContent();
+        }
+
+        private void AddPaginationMetadata<T>(ResourceParameters resourceParameters, PagedList<T> pagedList)
+        {
+            //string previousPageLink = null;
+            //string nextPageLink = null;
+
+            //if (pagedList.HasPrevious)
+            //{
+            //    previousPageLink = _urlHelper.Link("GetAuthors", new
+            //    {
+            //        fields = resourceParameters.Fields,
+            //        orderBy = resourceParameters.OrderBy,
+            //        genre = authorsResourceParameters.Genre,
+            //        search = authorsResourceParameters.Search,
+            //        pageNumber = pagedList.CurrentPage - 1,
+            //        pageSize = pagedList.PageSize
+            //    });
+            //}
+
+            //if (pagedList.HasNext)
+            //{
+            //    nextPageLink = _urlHelper.Link("GetAuthors", new
+            //    {
+            //        fields = resourceParameters.Fields,
+            //        orderBy = resourceParameters.OrderBy,
+            //        genre = authorsResourceParameters.Genre,
+            //        search = authorsResourceParameters.Search,
+            //        pageNumber = pagedList.CurrentPage + 1,
+            //        pageSize = pagedList.PageSize
+            //    });
+            //}
+
+            var paginationMetadata = new
+            {
+                totalCount = pagedList.TotalCount,
+                pageSize = pagedList.PageSize,
+                currentPage = pagedList.CurrentPage,
+                totalPages = pagedList.TotalPages,
+                //previousPageLink,
+                //nextPageLink
+            };
+
+            Response.Headers.Add("X-Pagination", JsonConvert.SerializeObject(paginationMetadata));
         }
     }
 }

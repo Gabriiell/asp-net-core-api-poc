@@ -2,10 +2,12 @@
 {
     public class ResourceParameters
     {
-        const int maxPageSize = 20;
-        public int PageNumber { get; set; } = 1;
-
         private int _pageSize = 10;
+        const int maxPageSize = 20;
+
+        public int PageNumber { get; set; } = 1;
+        public string OrderBy { get; set; }
+        public string Fields { get; set; }
 
         public int PageSize
         {

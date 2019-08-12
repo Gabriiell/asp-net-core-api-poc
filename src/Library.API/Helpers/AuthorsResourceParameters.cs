@@ -5,9 +5,6 @@
         private string _genre;
         private string _search;
 
-        public string OrderBy { get; set; }
-        public string Fields { get; set; }
-
         public string Genre
         {
             get
