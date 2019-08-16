@@ -15,12 +15,14 @@ namespace Library.API.Controllers
         private readonly ILibraryRepository _libraryRepository;
         private readonly IMapper _mapper;
         private readonly ILogger _logger;
+        private readonly IUrlHelper _urlHelper;
 
-        public BooksController(ILibraryRepository libraryRepository, ILogger<BooksController> logger, IMapper mapper)
+        public BooksController(ILibraryRepository libraryRepository, ILogger<BooksController> logger, IMapper mapper, IUrlHelper urlHelper)
         {
             _libraryRepository = libraryRepository;
             _logger = logger;
             _mapper = mapper;
+            _urlHelper = urlHelper;
         }
 
         [HttpGet]
@@ -54,6 +56,8 @@ namespace Library.API.Controllers
             }
 
             var bookDto = _mapper.Map<BookDto>(book);
+
+            CreateLinksForBook(bookDto);
 
             return Ok(bookDto);
         }
@@ -94,7 +98,7 @@ namespace Library.API.Controllers
             }, bookDto);
         }
 
-        [HttpDelete("{id}")]
+        [HttpDelete("{id}", Name = "DeleteBookForAuthor")]
         public IActionResult DeleteBookForAuthor(Guid authorId, Guid id)
         {
             if (!_libraryRepository.AuthorExists(authorId))
@@ -121,7 +125,7 @@ namespace Library.API.Controllers
             return NoContent();
         }
 
-        [HttpPut("{id}")]
+        [HttpPut("{id}", Name = "UpdateBookForAuthor")]
         public IActionResult UpdateBookForAuthor(Guid authorId, Guid id, [FromBody] BookForUpdateDto book)
         {
             if (book == null)
@@ -158,7 +162,7 @@ namespace Library.API.Controllers
             return NoContent();
         }
 
-        [HttpPatch("{id}")]
+        [HttpPatch("{id}", Name = "PartiallyUpdateBookForAuthor")]
         public IActionResult PartiallyUpdateBookForAuthor(Guid authorId, Guid id, [FromBody] JsonPatchDocument<BookForUpdateDto> patchDoc)
         {
             if (patchDoc == null)
@@ -199,6 +203,39 @@ namespace Library.API.Controllers
             }
 
             return NoContent();
+        }
+
+        private BookDto CreateLinksForBook(BookDto book)
+        {
+            book.Links.Add(new LinkDto
+            (
+                _urlHelper.Link("GetBookForAuthor", new { id = book.Id, authorId = book.AuthorId }),
+                "self",
+                "GET"
+            ));
+
+            book.Links.Add(new LinkDto
+            (
+                _urlHelper.Link("DeleteBookForAuthor", new { id = book.Id, authorId = book.AuthorId }),
+                "delete_book",
+                "DELETE"
+            ));
+
+            book.Links.Add(new LinkDto
+            (
+                _urlHelper.Link("UpdateBookForAuthor", new { id = book.Id, authorId = book.AuthorId }),
+                "update_book",
+                "PUT"
+            ));
+
+            book.Links.Add(new LinkDto
+            (
+                _urlHelper.Link("PartiallyUpdateBookForAuthor", new { id = book.Id, authorId = book.AuthorId }),
+                "partially_update_book",
+                "PATCH"
+            ));
+
+            return book;
         }
     }
 }
