@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace Library.API.Controllers
 {
@@ -25,7 +26,7 @@ namespace Library.API.Controllers
             _urlHelper = urlHelper;
         }
 
-        [HttpGet]
+        [HttpGet(Name = "GetBooksForAuthor")]
         public IActionResult GetBooksForAuthor(Guid authorId)
         {
             if (!_libraryRepository.AuthorExists(authorId))
@@ -36,8 +37,11 @@ namespace Library.API.Controllers
             var books = _libraryRepository.GetBooksForAuthor(authorId);
 
             var booksDto = _mapper.Map<IEnumerable<BookDto>>(books);
+            booksDto.ToList().ForEach(b => CreateLinksForBook(b));
+            var wrapper = new LinkedCollectionResourceWrapperDto<BookDto>(booksDto);
+            CreateLinksForBook(wrapper);
 
-            return Ok(booksDto);
+            return Ok(wrapper);
         }
 
         [HttpGet("{id}", Name = "GetBookForAuthor")]
@@ -236,6 +240,18 @@ namespace Library.API.Controllers
             ));
 
             return book;
+        }
+
+        private LinkedCollectionResourceWrapperDto<BookDto> CreateLinksForBook(LinkedCollectionResourceWrapperDto<BookDto> booksWrapper)
+        {
+            booksWrapper.Links.Add(new LinkDto
+            (
+                _urlHelper.Link("GetBooksForAuthor", new { }),
+                "self",
+                "GET"
+            ));
+
+            return booksWrapper;
         }
     }
 }
