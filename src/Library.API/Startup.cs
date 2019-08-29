@@ -19,6 +19,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Infrastructure;
 using Microsoft.AspNetCore.Mvc.Routing;
 using Newtonsoft.Json.Serialization;
+using Marvin.Cache.Headers;
 
 namespace Library.API
 {
@@ -72,6 +73,10 @@ namespace Library.API
             });
 
             services.AddTransient<IPropertyMappingService, PropertyMappingService>();
+
+            services.AddHttpCacheHeaders((ExpirationModelOptions expirationModelOptions) => expirationModelOptions.MaxAge = 600, (ValidationModelOptions validationModelOptions) => validationModelOptions.MustRevalidate = true);
+
+            services.AddResponseCaching();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -105,6 +110,8 @@ namespace Library.API
             libraryContext.EnsureSeedDataForContext();
             autoMapper.ConfigurationProvider.AssertConfigurationIsValid();
 
+            app.UseResponseCaching();
+            app.UseHttpCacheHeaders();
             app.UseMvc(); 
         }
     }
