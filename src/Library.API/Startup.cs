@@ -20,6 +20,7 @@ using Microsoft.AspNetCore.Mvc.Infrastructure;
 using Microsoft.AspNetCore.Mvc.Routing;
 using Newtonsoft.Json.Serialization;
 using Marvin.Cache.Headers;
+using AspNetCoreRateLimit;
 
 namespace Library.API
 {
@@ -77,6 +78,32 @@ namespace Library.API
             services.AddHttpCacheHeaders((ExpirationModelOptions expirationModelOptions) => expirationModelOptions.MaxAge = 600, (ValidationModelOptions validationModelOptions) => validationModelOptions.MustRevalidate = true);
 
             services.AddResponseCaching();
+
+            services.AddMemoryCache();
+
+            services.Configure<IpRateLimitOptions>(options =>
+            {
+                options.GeneralRules = new List<RateLimitRule>()
+                {
+                    new RateLimitRule()
+                    {
+                        Endpoint = "*",
+                        Limit = 1000,
+                        Period = "5m"
+                    },
+                    new RateLimitRule()
+                    {
+                        Endpoint = "*",
+                        Limit = 200,
+                        Period = "10s"
+                    }
+                };
+            });
+
+            services.AddSingleton<IRateLimitCounterStore, MemoryCacheRateLimitCounterStore>();
+            services.AddSingleton<IIpPolicyStore, MemoryCacheIpPolicyStore>();
+            services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
+            services.AddSingleton<IRateLimitConfiguration, RateLimitConfiguration>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -109,6 +136,8 @@ namespace Library.API
 
             libraryContext.EnsureSeedDataForContext();
             autoMapper.ConfigurationProvider.AssertConfigurationIsValid();
+
+            app.UseIpRateLimiting();
 
             app.UseResponseCaching();
             app.UseHttpCacheHeaders();
